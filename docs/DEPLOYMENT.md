@@ -36,7 +36,7 @@ TLS: set `DATABASE_SSL=verify` and `DATABASE_CA_CERT` to Supabase's root certifi
 - Import the repository; framework preset Next.js; Node ≥ 20.9.
 - Environment variables (see `.env.example`). Production must set `NEXT_PUBLIC_KORA_ENV=production` (hides sample data, enables indexing).
 - Optional: `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` if running multiple builds side by side.
-- Cron: `vercel.json` calls `/api/cron/reminders` hourly; Vercel sends `Authorization: Bearer $CRON_SECRET`.
+- Cron: `vercel.json` calls `/api/cron/reminders` once a day (12:00 UTC — the Hobby plan allows only daily crons); Vercel sends `Authorization: Bearer $CRON_SECRET`. Each run reminds for appointments in the next 24 hours, so every appointment is reminded once; on a Pro plan switch to hourly (`0 * * * *`) for more timely reminders.
 - Enable Vercel Firewall / bot protection on `/sign-in`, `/sign-up` and `/api/*` for IP-level rate limiting.
 
 ## 4. Stripe (optional)

@@ -14,7 +14,7 @@ function authorized(req: NextRequest) {
   return given.length === expected.length && timingSafeEqual(given, expected);
 }
 
-/** Hourly (vercel.json): creates in-app reminders and expires stale requests. */
+/** Scheduled in vercel.json (daily on Hobby, hourly on Pro): creates in-app reminders and expires stale requests. */
 export async function GET(req: NextRequest) {
   if (!authorized(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
