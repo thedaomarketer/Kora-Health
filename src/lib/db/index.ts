@@ -15,6 +15,12 @@ import { env } from "@/lib/env";
  * sparingly (webhooks, scheduled jobs, AI message persistence) — it bypasses RLS.
  */
 
+// Return timestamps as ISO-8601 strings and dates as YYYY-MM-DD so values
+// serialize predictably from Server Components to Client Components.
+const parseTimestamptz = pg.types.getTypeParser(pg.types.builtins.TIMESTAMPTZ);
+pg.types.setTypeParser(pg.types.builtins.TIMESTAMPTZ, (v: string) => (parseTimestamptz(v) as Date).toISOString());
+pg.types.setTypeParser(pg.types.builtins.DATE, (v: string) => v);
+
 export class DatabaseUnavailableError extends Error {
   constructor() {
     super("Database is not configured");
