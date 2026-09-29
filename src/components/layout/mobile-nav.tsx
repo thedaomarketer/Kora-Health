@@ -20,8 +20,12 @@ export function MobileNav({
   const pathname = usePathname();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Close on navigation.
-  useEffect(() => setOpen(false), [pathname]);
+  // Close on navigation (state adjusted during render, not in an effect).
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
+    setOpen(false);
+  }
 
   // Close on Escape and return focus to the toggle.
   useEffect(() => {

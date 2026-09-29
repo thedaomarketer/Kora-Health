@@ -249,6 +249,25 @@ d("database security & workflows", () => {
     });
   });
 
+  // --------------------------------------------------------- slots & visibility
+  describe("open slots and care-relationship visibility", () => {
+    it("exposes only times (never patients) for public providers", async () => {
+      const slots = await db.as(null, (q) => q(`select * from public.provider_open_slots($1, 30, 14)`, [providerId]));
+      expect(slots.length).toBeGreaterThan(0);
+      expect(Object.keys(slots[0]).sort()).toEqual(["ends_at", "modality", "starts_at"]);
+      const hidden = await db.as(null, (q) => q(`select * from public.provider_open_slots($1, 30, 14)`, [otherProviderId]));
+      expect(hidden).toHaveLength(0);
+    });
+
+    it("keeps an unpublished provider visible to their existing patients only", async () => {
+      await db.as(providerUser, (q) => q(`update public.provider_profiles set is_published = false where id = $1`, [providerId]));
+      expect(await db.as(null, (q) => q(`select id from public.provider_profiles where id = $1`, [providerId]))).toHaveLength(0);
+      expect(await db.as(patientB, (q) => q(`select id from public.provider_profiles where id = $1`, [providerId]))).toHaveLength(0);
+      expect(await db.as(patientA, (q) => q(`select id from public.provider_profiles where id = $1`, [providerId]))).toHaveLength(1);
+      await db.as(providerUser, (q) => q(`update public.provider_profiles set is_published = true where id = $1`, [providerId]));
+    });
+  });
+
   // --------------------------------------------------------------- messaging
   describe("messaging", () => {
     let conversationId: string;

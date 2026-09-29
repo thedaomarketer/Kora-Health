@@ -20,7 +20,8 @@ const schema = z.object({
   DATABASE_SSL: z.enum(["require", "disable"]).default("require"),
 
   ANTHROPIC_API_KEY: z.string().min(10).optional(),
-  KORA_AI_MODEL: z.string().default("claude-sonnet-5-5"),
+  KORA_AI_MODEL: z.string().default("claude-opus-5-5"),
+  KORA_AI_EFFORT: z.enum(["low", "medium", "high"]).default("medium"),
 
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),

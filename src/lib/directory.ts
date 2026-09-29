@@ -144,7 +144,11 @@ export async function searchProviders(params: SearchParams) {
 
   const rows = await asAnon((q) => q<ProviderSummary & { total: string }>(sql, values));
   return {
-    providers: rows.map(({ total: _total, ...r }) => ({ ...r, distance_km: r.distance_km === null ? null : Number(r.distance_km) })),
+    providers: rows.map((row) => {
+      const r: ProviderSummary & { total?: string } = { ...row };
+      delete r.total;
+      return { ...r, distance_km: r.distance_km === null ? null : Number(r.distance_km) };
+    }),
     total: rows[0] ? Number(rows[0].total) : 0,
     page,
     pageSize: PAGE_SIZE,
@@ -210,4 +214,18 @@ export async function getOpenSlots(providerId: string, durationMinutes: number, 
 
 export function providerFullName(p: Pick<ProviderSummary, "honorific" | "display_name">) {
   return [p.honorific, p.display_name].filter(Boolean).join(" ");
+}
+
+/** Public providers for matching (scored in application code). */
+export async function listProvidersForMatching(limit = 300) {
+  return asAnon((q) =>
+    q<ProviderSummary>(
+      `select ${SUMMARY_COLUMNS}, null::float8 as distance_km
+         from public.provider_profiles p
+         left join public.professions pr on pr.id = p.profession_id
+        ${showDemoData ? "" : "where not p.is_demo"}
+        order by p.display_name limit $1`,
+      [limit],
+    ),
+  );
 }
