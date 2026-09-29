@@ -87,7 +87,7 @@ const providerSchema = z
     pronouns: optionalText(40),
     profession: z.string().regex(/^[a-z0-9-]+$/, "Choose your profession."),
     specialties: z.array(z.string().regex(/^[a-z0-9-]+$/)).min(1, "Choose at least one specialty.").max(8, "Choose up to 8 specialties."),
-    primarySpecialty: z.string().regex(/^[a-z0-9-]+$/).optional(),
+    primarySpecialty: z.union([z.string().regex(/^[a-z0-9-]+$/), z.literal("")]).optional().transform((v) => v || undefined),
     headline: optionalText(160),
     bio: optionalText(3000),
     languages: z.array(languageCode).min(1, "Choose at least one language.").max(20),
@@ -139,7 +139,7 @@ export async function saveProviderProfileAction(_prev: ActionResult | null, fd: 
       await q(`delete from public.provider_specialties where provider_id = $1`, [profile.id]);
       await q(
         `insert into public.provider_specialties (provider_id, specialty_id, is_primary)
-         select $1, id, slug = coalesce($3, $2[1]) from public.specialties where slug = any($2)`,
+         select $1, id, slug = coalesce($3::text, ($2::text[])[1]) from public.specialties where slug = any($2::text[])`,
         [profile.id, d.specialties, d.primarySpecialty ?? null],
       );
       if (d.mode === "onboarding" && d.city && d.country) {
