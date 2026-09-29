@@ -34,3 +34,21 @@ export async function expectNoA11yBasics(page: Page) {
   await expect(page.locator("h1")).toHaveCount(1);
   await expect(page.locator("main#main")).toHaveCount(1);
 }
+
+/** Operator bootstrap: grant an admin role directly in the database (tests only). */
+export async function grantAdminRole(email: string, role: "moderator" | "verifier" | "superadmin") {
+  const url = process.env.E2E_DB_ADMIN_URL;
+  if (!url) throw new Error("E2E_DB_ADMIN_URL is required for admin tests");
+  const { default: pg } = await import("pg");
+  const client = new pg.Client({ connectionString: url });
+  await client.connect();
+  try {
+    await client.query(
+      `insert into public.administrators (user_id, admin_role) select id, $2 from public.users where email = $1
+       on conflict (user_id) do update set admin_role = excluded.admin_role`,
+      [email, role],
+    );
+  } finally {
+    await client.end();
+  }
+}

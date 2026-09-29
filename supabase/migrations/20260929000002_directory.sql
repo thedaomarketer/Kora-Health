@@ -488,6 +488,8 @@ begin
          verified_at = case when p_decision = 'approved' then now() else null end
    where id = v_provider;
 
+  perform public.notify(v_provider_user, 'verification.decision', 'Verification update',
+    'Kora has reviewed your credentials. Sign in to see the result.', '/provider/verification');
   perform public.write_audit('admin.verification_' || p_decision, 'provider_verification',
     p_verification_id::text, v_provider_user,
     jsonb_build_object('provider_id', v_provider, 'checks', p_checks));
