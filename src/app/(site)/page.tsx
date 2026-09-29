@@ -24,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/alert";
 import { ProviderCard } from "@/components/directory/provider-card";
 import { HeroVisual } from "@/components/marketing/hero-visual";
+import { HeroBackground } from "@/components/marketing/hero-background";
+import { Reveal } from "@/components/marketing/reveal";
 import { getReferenceData, searchProviders, type ProviderSummary, type ReferenceData } from "@/lib/directory";
 import { asAnon } from "@/lib/db";
 import { features } from "@/lib/env";
@@ -51,17 +53,18 @@ export default async function HomePage() {
   return (
     <>
       <Hero specialties={data?.ref.specialties ?? []} />
-      <SearchSection ref_={data?.ref ?? null} />
-      <AiSection />
-      <HowItWorks />
-      <FindProvider providers={data?.featured ?? []} />
-      <Specialties specialties={data?.ref.specialties ?? []} />
-      <ConnectedData integrations={data?.integrations ?? []} />
-      <ProviderOnboarding />
-      <PrivacySecurity />
-      <Community />
-      <Faq />
-      <FinalCta />
+      <SpecialtyMarquee specialties={data?.ref.specialties ?? []} />
+      <Reveal><SearchSection ref_={data?.ref ?? null} /></Reveal>
+      <Reveal><AiSection /></Reveal>
+      <Reveal><HowItWorks /></Reveal>
+      <Reveal><FindProvider providers={data?.featured ?? []} /></Reveal>
+      <Reveal><Specialties specialties={data?.ref.specialties ?? []} /></Reveal>
+      <Reveal><ConnectedData integrations={data?.integrations ?? []} /></Reveal>
+      <Reveal><ProviderOnboarding /></Reveal>
+      <Reveal><PrivacySecurity /></Reveal>
+      <Reveal><Community /></Reveal>
+      <Reveal><Faq /></Reveal>
+      <Reveal><FinalCta /></Reveal>
     </>
   );
 }
@@ -81,8 +84,8 @@ function SectionHeading({ eyebrow, title, description, id }: { eyebrow: string; 
 /* 1. Hero ------------------------------------------------------------------ */
 function Hero({ specialties }: { specialties: ReferenceData["specialties"] }) {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[36rem] bg-gradient-to-b from-brand-50/80 to-transparent" />
+    <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
+      <HeroBackground />
       <div className="container-page grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:py-24">
         <div className="animate-fade-up">
           <Badge tone="clay" className="mb-5">
@@ -90,7 +93,7 @@ function Hero({ specialties }: { specialties: ReferenceData["specialties"] }) {
           </Badge>
           <h1 id="hero-title" className="font-display text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl">
             Find care. Connect with professionals.{" "}
-            <span className="text-brand-700">Navigate your health.</span>
+            <span className="text-shimmer">Navigate your health.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
             Kora Health helps Black patients and communities discover healthcare professionals, request appointments,
@@ -128,6 +131,25 @@ function Hero({ specialties }: { specialties: ReferenceData["specialties"] }) {
         <HeroVisual />
       </div>
     </section>
+  );
+}
+
+
+function SpecialtyMarquee({ specialties }: { specialties: ReferenceData["specialties"] }) {
+  if (specialties.length < 6) return null;
+  const items = [...specialties, ...specialties];
+  return (
+    <div aria-hidden className="marquee-wrap relative border-y border-line/60 bg-white/60 py-4 backdrop-blur">
+      <div className="mx-auto flex max-w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <ul className="marquee flex shrink-0 gap-3 pr-3">
+          {items.map((s, i) => (
+            <li key={`${s.slug}-${i}`} className="whitespace-nowrap rounded-full bg-white px-4 py-1.5 text-sm font-medium text-brand-800 ring-1 ring-brand-100">
+              {s.name}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
