@@ -10,6 +10,7 @@ import { features } from "@/lib/env";
 import { type ActionResult, failure } from "@/lib/errors";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase/server";
 import { formToObject } from "@/lib/validation";
+import { safeNextPath } from "@/lib/constants";
 
 const consentType = z.enum(["ai_assistant", "health_data_storage", "matching_personalization", "product_updates"]);
 
@@ -21,7 +22,7 @@ export async function setConsentAction(fd: FormData) {
   await asUser(user, (q) => syncConsents(q, { [parsed.data.type]: parsed.data.granted === "1" }));
   revalidatePath("/settings");
   revalidatePath("/patient", "layout");
-  if (parsed.data.back?.startsWith("/") && !parsed.data.back.startsWith("//")) redirect(parsed.data.back);
+  if (parsed.data.back) redirect(safeNextPath(parsed.data.back, "/settings"));
 }
 
 export async function updateAccountAction(_prev: ActionResult | null, fd: FormData): Promise<ActionResult> {

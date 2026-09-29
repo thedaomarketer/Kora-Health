@@ -16,11 +16,15 @@ const LABELS: Record<string, string> = {
   ai_messages_7d: "AI messages (7 days)", active_integrations: "Active integrations",
 };
 
+async function timed<T>(fn: () => Promise<T>) {
+  const started = performance.now();
+  const result = await fn();
+  return { result, ms: Math.round(performance.now() - started) };
+}
+
 export default async function AdminOverview() {
   const user = await requireAdmin();
-  const started = Date.now();
-  const [{ s }] = await asUser(user, (q) => q<{ s: Record<string, number> }>(`select public.admin_platform_stats() as s`));
-  const dbLatency = Date.now() - started;
+  const { result: s, ms: dbLatency } = await timed(async () => (await asUser(user, (q) => q<{ s: Record<string, number> }>(`select public.admin_platform_stats() as s`)))[0].s);
   const health = [
     ["Database", true, `${dbLatency} ms round trip`],
     ["Authentication", features.auth, features.auth ? "Supabase Auth configured" : "Not configured"],

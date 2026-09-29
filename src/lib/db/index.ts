@@ -39,7 +39,10 @@ function pool(): pg.Pool {
       max: env.DATABASE_POOL_MAX,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 5_000,
-      ssl: env.DATABASE_SSL === "require" ? { rejectUnauthorized: true } : undefined,
+      ssl:
+        env.DATABASE_SSL === "verify"
+          ? { rejectUnauthorized: true, ca: env.DATABASE_CA_CERT?.replace(/\\n/g, "\n") }
+          : undefined,
       statement_timeout: 10_000,
     });
   }

@@ -128,10 +128,10 @@ export function Checkbox({
     <label className={cn("flex cursor-pointer items-start gap-3 rounded-xl p-2 -m-2 hover:bg-brand-50/60", className)}>
       <input
         type="checkbox"
-        className="mt-0.5 size-5 shrink-0 rounded border-line accent-brand-700 focus-visible:outline-3 focus-visible:outline-brand-500"
+        className="size-6 shrink-0 rounded border-line accent-brand-700 focus-visible:outline-3 focus-visible:outline-brand-500"
         {...props}
       />
-      <span className="text-sm">
+      <span className="pt-0.5 text-sm">
         <span className="font-medium text-ink">{label}</span>
         {description ? <span className="mt-0.5 block text-muted">{description}</span> : null}
       </span>

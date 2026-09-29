@@ -17,7 +17,10 @@ const schema = z.object({
   /** Connection string for the `kora_app` role (see docs/DEPLOYMENT.md). */
   DATABASE_URL: z.string().startsWith("postgres").optional(),
   DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(50).default(5),
-  DATABASE_SSL: z.enum(["require", "disable"]).default("require"),
+  /** "verify" (default) validates the server certificate; "disable" is for local development only. */
+  DATABASE_SSL: z.enum(["verify", "disable"]).default("verify"),
+  /** PEM CA certificate for DATABASE_SSL=verify (e.g. Supabase's root CA). Falls back to system CAs. */
+  DATABASE_CA_CERT: z.string().optional(),
 
   ANTHROPIC_API_KEY: z.string().min(10).optional(),
   KORA_AI_MODEL: z.string().default("claude-opus-5-5"),
@@ -33,6 +36,9 @@ const schema = z.object({
 
 function load() {
   const parsed = schema.safeParse(process.env);
+  if (parsed.success && parsed.data.NODE_ENV === "production" && parsed.data.NEXT_PUBLIC_KORA_ENV === "production" && parsed.data.DATABASE_SSL === "disable") {
+    throw new Error("Invalid environment configuration: DATABASE_SSL=disable is not allowed in production");
+  }
   if (!parsed.success) {
     // Log names only — never values.
     const fields = parsed.error.issues.map((i) => i.path.join(".")).join(", ");

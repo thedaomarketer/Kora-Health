@@ -241,12 +241,12 @@ export default async function ProviderProfilePage({ params }: PageProps<"/provid
 
 function Detail({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
-    <div className="flex gap-3">
-      <span className="mt-0.5 text-brand-700">{icon}</span>
-      <div>
-        <dt className="font-semibold text-ink">{label}</dt>
-        <dd className="mt-0.5 text-ink/80">{children}</dd>
-      </div>
+    <div>
+      <dt className="flex items-center gap-2 font-semibold text-ink">
+        <span className="text-brand-700">{icon}</span>
+        {label}
+      </dt>
+      <dd className="mt-0.5 pl-6 text-ink/80">{children}</dd>
     </div>
   );
 }

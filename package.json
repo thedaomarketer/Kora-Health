@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:db": "vitest run --project db",
+    "test:e2e": "playwright test --project=desktop",
+    "test:e2e:mobile": "playwright test --project=mobile",
+    "test:all": "npm run test && npm run test:db && npm run test:e2e",
+    "stack:build-auth": "scripts/local-stack/build-auth.sh",
+    "stack:db": "scripts/local-stack/setup-db.sh",
+    "stack:start": "scripts/local-stack/start.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
@@ -21,6 +30,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.20.4",
@@ -34,5 +44,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }

@@ -118,7 +118,7 @@ export default async function FindCarePage({ searchParams }: PageProps<"/patient
               <Fieldset legend="Type of care">
                 {[["either", "No preference"], ["virtual", "Virtual"], ["in_person", "In person"]].map(([v, l]) => (
                   <label key={v} className="flex min-h-8 items-center gap-2 text-sm">
-                    <input type="radio" name="care" value={v} defaultChecked={prefs.care === v} className="size-4 accent-brand-700" /> {l}
+                    <input type="radio" name="care" value={v} defaultChecked={prefs.care === v} className="size-5 accent-brand-700" /> {l}
                   </label>
                 ))}
               </Fieldset>

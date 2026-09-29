@@ -106,7 +106,7 @@ export default async function ProvidersPage({ searchParams }: PageProps<"/provid
                   ["in_person", "In-person care"],
                 ].map(([value, label]) => (
                   <label key={value} className="flex min-h-9 items-center gap-3 text-sm">
-                    <input type="radio" name="care" value={value} defaultChecked={(params.care ?? "") === value} className="size-4 accent-brand-700" />
+                    <input type="radio" name="care" value={value} defaultChecked={(params.care ?? "") === value} className="size-5 accent-brand-700" />
                     {label}
                   </label>
                 ))}
