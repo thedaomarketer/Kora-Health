@@ -26,6 +26,8 @@ const schema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
 
   CRON_SECRET: z.string().min(16).optional(),
+  /** "true" once Supabase Storage buckets exist (hosted Supabase). */
+  KORA_STORAGE_ENABLED: z.enum(["true", "false"]).default("false"),
 });
 
 function load() {
@@ -52,6 +54,9 @@ export const features = {
   },
   get payments() {
     return Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET);
+  },
+  get storage() {
+    return env.KORA_STORAGE_ENABLED === "true" && Boolean(env.NEXT_PUBLIC_SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
   },
   get accountDeletion() {
     return Boolean(env.SUPABASE_SERVICE_ROLE_KEY && env.NEXT_PUBLIC_SUPABASE_URL);

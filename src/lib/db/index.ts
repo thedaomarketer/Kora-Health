@@ -17,8 +17,14 @@ import { env } from "@/lib/env";
 
 // Return timestamps as ISO-8601 strings and dates as YYYY-MM-DD so values
 // serialize predictably from Server Components to Client Components.
-const parseTimestamptz = pg.types.getTypeParser(pg.types.builtins.TIMESTAMPTZ);
-pg.types.setTypeParser(pg.types.builtins.TIMESTAMPTZ, (v: string) => (parseTimestamptz(v) as Date).toISOString());
+export function pgTimestamptzToIso(v: string): string {
+  if (v === "infinity" || v === "-infinity") return v;
+  // "2026-09-30 13:00:00.123+00" / "+05:30" → ISO 8601
+  const iso = v.replace(" ", "T").replace(/([+-]\d{2})$/, "$1:00").replace(/([+-]\d{2})(\d{2})$/, "$1:$2");
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? v : d.toISOString();
+}
+pg.types.setTypeParser(pg.types.builtins.TIMESTAMPTZ, pgTimestamptzToIso);
 pg.types.setTypeParser(pg.types.builtins.DATE, (v: string) => v);
 
 export class DatabaseUnavailableError extends Error {
