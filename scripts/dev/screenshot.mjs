@@ -1,0 +1,11 @@
+import { chromium } from "@playwright/test";
+const [,, url, out, width = "1280", full = "1"] = process.argv;
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium" });
+const page = await browser.newPage({ viewport: { width: Number(width), height: 900 } });
+const errors = [];
+page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+page.on("pageerror", (e) => errors.push(String(e)));
+await page.goto(url, { waitUntil: "networkidle" });
+await page.screenshot({ path: out, fullPage: full === "1" });
+console.log(JSON.stringify({ errors }));
+await browser.close();
